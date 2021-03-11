@@ -1,0 +1,1087 @@
+// ImageStuDlg.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "ImageStu.h"
+#include "ImageStuDlg.h"
+#include "DlgShowArray.h"
+#include "DlgTask.h"
+#include <atlimage.h>
+#include <afxole.h>
+
+
+#include <sstream>
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// CAboutDlg dialog used for App About
+
+class CAboutDlg : public CDialog
+{
+public:
+	CAboutDlg();
+
+// Dialog Data
+	//{{AFX_DATA(CAboutDlg)
+	enum { IDD = IDD_ABOUTBOX };
+	//}}AFX_DATA
+
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CAboutDlg)
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	//}}AFX_VIRTUAL
+
+// Implementation
+protected:
+	//{{AFX_MSG(CAboutDlg)
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+};
+
+CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+{
+	//{{AFX_DATA_INIT(CAboutDlg)
+	//}}AFX_DATA_INIT
+}
+
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	//{{AFX_DATA_MAP(CAboutDlg)
+	//}}AFX_DATA_MAP
+}
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+	//{{AFX_MSG_MAP(CAboutDlg)
+		// No message handlers
+	//}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+
+/////////////////////////////////////////////////////////////////////////////
+// CImageStuDlg dialog
+
+CImageStuDlg::CImageStuDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CImageStuDlg::IDD, pParent)
+{
+	//{{AFX_DATA_INIT(CImageStuDlg)
+		// NOTE: the ClassWizard will add member initialization here
+	//}}AFX_DATA_INIT
+	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	// 图像已打开标记
+	_flag = false;
+
+}
+
+void CImageStuDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	//{{AFX_DATA_MAP(CImageStuDlg)
+		// NOTE: the ClassWizard will add DDX and DDV calls here
+	//}}AFX_DATA_MAP
+}
+
+BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
+	//{{AFX_MSG_MAP(CImageStuDlg)
+	ON_WM_SYSCOMMAND()
+	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	ON_COMMAND(IDC_FILE_OPEN, OnFileOpen)
+	ON_WM_DESTROY()
+	ON_COMMAND(IDC_FILE_SHOW_ARRAY, OnFileShowArray)
+	ON_COMMAND(IDC_FILE_SAVE, OnFileSave)
+	//}}AFX_MSG_MAP
+	ON_COMMAND(ID_FULL_RED, &CImageStuDlg::OnFullRed)
+	ON_COMMAND(ID_COLOR_GRAY, &CImageStuDlg::OnColorGray)
+	ON_COMMAND(ID_RED_BLUE, &CImageStuDlg::OnRedBlue)
+	ON_COMMAND(ID_GREY_WB, &CImageStuDlg::OnGreyWb)
+END_MESSAGE_MAP()
+
+/////////////////////////////////////////////////////////////////////////////
+// CImageStuDlg message handlers
+
+BOOL CImageStuDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// Add "About..." menu item to system menu.
+
+	// IDM_ABOUTBOX must be in the system command range.
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
+
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != NULL)
+	{
+		CString strAboutMenu;
+		strAboutMenu.LoadString(IDS_ABOUTBOX);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
+
+	// Set the icon for this dialog.  The framework does this automatically
+	//  when the application's main window is not a dialog
+	SetIcon(m_hIcon, TRUE);			// Set big icon
+	SetIcon(m_hIcon, FALSE);		// Set small icon
+	
+	// TODO: Add extra initialization here
+	
+	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CImageStuDlg::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	{
+		CAboutDlg dlgAbout;
+		dlgAbout.DoModal();
+	}
+	else
+	{
+		CDialog::OnSysCommand(nID, lParam);
+	}
+}
+
+// If you add a minimize button to your dialog, you will need the code below
+//  to draw the icon.  For MFC applications using the document/view model,
+//  this is automatically done for you by the framework.
+
+void CImageStuDlg::OnPaint() 
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // device context for painting
+
+		SendMessage(WM_ICONERASEBKGND, (WPARAM) dc.GetSafeHdc(), 0);
+
+		// Center icon in client rectangle
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// Draw the icon
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		CDialog::OnPaint();
+	}
+
+	// 绘图
+	CDC * pDC = GetDC();
+	if( _flag == true ){
+		
+		// 已经打开文件
+		SetDIBitsToDevice(
+			  pDC->m_hDC  // 设备描述表
+			, 0 // 设备描述表位图输出的起始逻辑x坐标
+			, 0 // 设备描述表位图输出的起始逻辑y坐标
+			, _infoHeader.biWidth // DIB的宽度
+			, _infoHeader.biHeight // DIB的高度
+			, 0 // DIB开始读取输出的像素数据的x位置
+			, 0 // DIB开始读取输出的像素数据的y位置
+			, 0 // DIB中像素的水平行号, 对应lpBits内存缓冲区的第一行数据
+			, _infoHeader.biHeight  // DIB的行数
+			, _lpBuf  // 像素数据
+			, _bitmapInfo //BITMAPINFO数据
+			, DIB_RGB_COLORS // 显示的颜色
+		);
+
+	}
+	ReleaseDC( pDC );
+
+}
+
+// The system calls this to obtain the cursor to display while the user drags
+//  the minimized window.
+HCURSOR CImageStuDlg::OnQueryDragIcon()
+{
+	return (HCURSOR) m_hIcon;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 销毁对话框, 映射WM_DESTORY消息
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::OnDestroy() 
+{
+	CDialog::OnDestroy();
+	
+	// TODO: Add your message handler code here
+
+	if( _flag == true ){
+		FreeData();
+	}
+
+	
+}
+
+/************************************************************************/
+/*                           菜单                                       */
+/************************************************************************/
+
+//////////////////////////////////////////////////////////////////////////
+// "文件"-->"打开"(IDC_FILE_OPEN)
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::OnFileOpen()
+{
+	// TODO: Add your command handler code here
+
+	LPCTSTR lpszFilter =
+		"常见图片格式|*.bmp;*.jpg;*.png;*.gif;*.ico|"
+		"BMP Files|*.bmp|"
+		"JPEG Files|*.jpg|"
+		"PNG Files|*.png|"
+		"GIF Files|*.gif|"
+		"Icon Files|*.ico|"
+		"TIFF Files|*.tif|"
+		"WMF Files|*.wmf|"
+		"任何文件|*.*|";
+	CFileDialog dlg(TRUE, lpszFilter, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		lpszFilter, NULL);
+	
+	// 打开文件
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	// 文件名
+	CString fileName = dlg.GetPathName();
+
+	CImage image;
+	if (image.Load(fileName) != S_OK)
+	{
+		AfxMessageBox("无法打开文件", MB_OK, MB_ICONERROR);
+		return;
+	}
+
+	//将任意格式(bmp,jpg,png)的图像通过CImage全部转换为CFile内存流
+	COleStreamFile memStream;
+	memStream.CreateMemoryStream();
+	image.SetHasAlphaChannel(false);
+	image.Save(memStream.GetStream(), Gdiplus::ImageFormatBMP);
+	memStream.SeekToBegin();
+	image.Destroy();
+
+
+
+	// 读取文件头
+	if (!ReadFileHeader(memStream)) {
+		goto END;
+	}
+	// 读取信息头 
+	if (!ReadInfoHeader(memStream)) {
+		goto END;
+	}
+
+	// 若前面已有文件打开，则释放相应的数据
+	if (_flag == true) {
+		FreeData();
+		_flag = false;
+	}
+
+	// 计算调色板颜色数量
+	_numQuad = CalcQuadNum();
+	// 读取调色板数据
+	ReadQuad(memStream);
+
+	// 判断图像类型
+	_imageType = CalcImageType();
+
+	// 读入图像数据
+	ReadImageData(memStream);
+
+
+
+
+	// 分配处理后的数据
+	_processBuf = (BYTE *)HeapAlloc(GetProcessHeap(), 0, _infoHeader.biSizeImage);
+
+	// 宽度不是4的倍数则补齐
+	DWORD dwBytes = ((DWORD)_infoHeader.biWidth * _infoHeader.biBitCount) / 32;
+	if (((DWORD)_infoHeader.biWidth * _infoHeader.biBitCount) % 32) {
+		dwBytes++;
+	}
+	dwBytes *= 4;
+
+
+
+	Invalidate();
+
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+
+	// 分配空间
+	_colorData = new CBaseColorInfo[width * height];
+	_grayData = new int[width * height];
+
+	// 根据图像类型，将其转换成相应的图像数据
+	if (_imageType == COLOR_32_BIT) {
+		BMPConvertColor32();
+	}
+	else if (_imageType == COLOR_24_BIT) {
+		// 24位颜色图像
+		BMPConvertColor24();
+
+	}
+	else if (_imageType == COLOR_8_BIT) {
+		// 256彩色图像
+		BMPConvertColor8();
+	}
+	else if (_imageType == GRAY_8_BIT) {
+		// 256灰度图像
+		BMPConvertGray8();
+		// 将8位灰度数据转成用24位颜色
+		Gray8ConvertColor24(_grayData, _colorData, width, height);
+	}
+	else {
+		MessageBox("暂不支持该图像类型");
+		// 关闭图像
+		FreeData();
+		goto END;
+
+	}
+
+	// 图像读取完毕
+	_flag = true;
+END:
+	memStream.Close();
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// "文件"-->"显示数组图像"
+// 将转换后的24位彩色数据在对话框中显示
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::OnFileShowArray() 
+{
+	// TODO: Add your command handler code here
+
+	if(_flag == FALSE){
+		MessageBox("没有打开图像");
+		return;
+	}
+
+	CDlgShowArray dlg;
+	dlg.SetColorData( _colorData );
+	dlg.SetWidth( _infoHeader.biWidth );
+	dlg.SetHeight( _infoHeader.biHeight );
+	dlg.DoModal();
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// "文件"-->"保存"菜单
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::OnFileSave() 
+{
+	// TODO: Add your command handler code here
+	if( ! _flag  ){
+		MessageBox( "没有图片，无法保存" );
+		return;
+	}
+	
+	CFileDialog dlg(false,"*.bmp",NULL,NULL,"*.bmp|*.bmp||");
+	if (dlg.DoModal()==IDOK)
+	{
+		SaveAsBmp( (LPTSTR)(LPCTSTR)dlg.GetPathName(), _lpBuf, _infoHeader.biWidth, _infoHeader.biHeight, _infoHeader.biBitCount,
+			_quad );
+	}
+	
+}
+
+
+
+/************************************************************************/
+/*                         私有函数                                     */
+/************************************************************************/
+//////////////////////////////////////////////////////////////////////////
+// 读取文件头
+// 参数:
+//   file: CFile &, BMP文件
+// 返回值:
+//   BOOL, TRUE: 成功; FALSE: 失败
+//////////////////////////////////////////////////////////////////////////
+BOOL CImageStuDlg::ReadFileHeader( CFile &file ){
+
+	// 读取文件头
+	file.Read( &_fileHeader, sizeof( _fileHeader ) );
+	// 判断是否为BMP文件
+	if( _fileHeader.bfType != 0x4d42 ){
+		// "BM"
+		AfxMessageBox( "不是BMP文件", MB_OK, MB_ICONERROR );
+		return FALSE;
+	}
+
+	// 判断文件是否损坏(文件大小是否与文件头的信息一致)
+	if( file.GetLength() != _fileHeader.bfSize ){
+		AfxMessageBox( "文件已损坏", MB_OK, MB_ICONERROR );
+		return FALSE;
+	}
+
+	return TRUE;
+	
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// 读取文件信息头
+// 参数:
+//   file: CFile &, 已经打开的BMP文件
+// 返回值:
+//   BOOL, TRUE成功; 其它失败
+//////////////////////////////////////////////////////////////////////////
+BOOL CImageStuDlg::ReadInfoHeader( CFile &file ){
+
+	// 读取文件信息头
+	file.Read( &_infoHeader, sizeof( _infoHeader ) );
+
+	// 将图片格式限定在8位图像
+// 	if( _infoHeader.biBitCount != 8 ){
+// 		AfxMessageBox( "必须为8位灰度图", MB_OK, MB_ICONERROR );
+// 		return FALSE;
+// 	}
+
+	return TRUE;
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// 释放数据
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::FreeData(){
+
+	HeapFree( GetProcessHeap(), 0, _bitmapInfo );
+	HeapFree( GetProcessHeap(), 0, _lpBuf );
+	// 处理后的数据
+	HeapFree( GetProcessHeap(), 0, _processBuf );
+	// 灰度颜色数据
+	delete [] _grayData;
+	// 彩色颜色数据
+	delete [] _colorData;
+
+
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 计算调色板颜色数量
+// 参数: 无
+// 返回值:
+//   int, 调色板颜色数量
+//////////////////////////////////////////////////////////////////////////
+int CImageStuDlg::CalcQuadNum(){
+
+	// 计算调色板数据
+	int numQuad = 0;
+	if( _infoHeader.biBitCount < 24){
+		// 相当于2的biBitCount次方
+		numQuad = ( 1 << _infoHeader.biBitCount );
+	}
+
+	return numQuad;
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 读取调色板数据
+// 参数:
+//   file: CFile &, BMP文件
+// 返回值: 无
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::ReadQuad( CFile &file ){
+
+	// 为图像信息pbi申请空间
+	_bitmapInfo = ( BITMAPINFO * )HeapAlloc( 
+		GetProcessHeap(), 
+		0, 
+		sizeof( BITMAPINFOHEADER ) + _numQuad * sizeof( RGBQUAD ) 
+	);
+	memcpy( _bitmapInfo, &_infoHeader, sizeof( _infoHeader ) );
+	_quad = ( RGBQUAD * )( ( BYTE *)_bitmapInfo + sizeof( BITMAPINFOHEADER ) );
+
+	// 读取调色板
+	if( _numQuad != 0 ){
+		file.Read( _quad, sizeof( RGBQUAD ) * _numQuad );
+	}
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 判断是否为256色灰度图
+// 判断依据，调色板中所有颜色的的RGB三个分量应该相等
+// BOOL: TRUE为256色灰度图
+//////////////////////////////////////////////////////////////////////////
+BOOL CImageStuDlg::Is256Gray(){
+
+	BOOL result = TRUE;
+	for( int i = 0; i <= _numQuad - 1; i++ ){
+		RGBQUAD color = *( _quad + i );
+		//TRACE( "%d: %d, %d, %d\n", i, color.rgbRed,  color.rgbGreen, color.rgbBlue );
+		if( !( color.rgbRed == color.rgbGreen && color.rgbRed == color.rgbBlue ) ){
+			result = FALSE;
+			break;
+		}
+	}
+	
+	return result;
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 读入图像数据
+// 参数:
+//   file: CFile &, BMP图像
+// 返回值: 无
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::ReadImageData( CFile &file ){
+
+	// 为图像数据申请空间
+	_infoHeader.biSizeImage = _fileHeader.bfSize - _fileHeader.bfOffBits;
+	_lpBuf = ( BYTE *)HeapAlloc( GetProcessHeap(), 0, _infoHeader.biSizeImage );
+	// 读取图像数据
+	file.Read( _lpBuf, _infoHeader.biSizeImage );
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 判断图像类型
+// 参数: 无
+// 返回值: IMAGE_TYPE, 图像类型, 参数枚举IMAGE_TYPE的定义
+//////////////////////////////////////////////////////////////////////////
+IMAGE_TYPE CImageStuDlg::CalcImageType() {
+
+	switch (_infoHeader.biBitCount)
+	{
+	case IMAGE_TYPE_BIT_32:return COLOR_32_BIT;
+	case IMAGE_TYPE_BIT_24:return COLOR_24_BIT;
+	case IMAGE_TYPE_BIT_1:return GRAY_1_BIT;
+	case IMAGE_TYPE_BIT_8:return Is256Gray() ? GRAY_8_BIT : COLOR_8_BIT;
+	default:
+		return UNKNOWN_IMAGE_TYPE;
+		break;
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// 将BMP数据转换成32位颜色数据
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::BMPConvertColor32() {
+
+	// 宽度不是4的倍数则补齐
+	DWORD dwBytes = ((DWORD)_infoHeader.biWidth * _infoHeader.biBitCount) / 32;
+	if (((DWORD)_infoHeader.biWidth * _infoHeader.biBitCount) % 32) {
+		dwBytes++;
+	}
+	dwBytes *= 4;
+
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	// 分配彩色数据
+
+	int i, j;
+
+	for (i = 0; i <= height - 1; i++) {
+		for (j = 0; j <= width - 1; j++) {
+
+			// BMP图片数据中的坐标
+			DWORD index = i * 4 * width + 4 * j;
+			if (dwBytes % 4 != 0) {
+				index = i * dwBytes + 4 * j;
+			}
+			// 颜色数组中的坐标
+			DWORD resultIndex = (height - 1 - i) * width + j;
+			_colorData[resultIndex].SetRed(_lpBuf[index + 2]);
+			_colorData[resultIndex].SetGreen(_lpBuf[index + 1]);
+			_colorData[resultIndex].SetBlue(_lpBuf[index]);
+
+		}// for j
+	}// for i 
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 将BMP数据转换成24位颜色数据
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::BMPConvertColor24(){
+
+	// 宽度不是4的倍数则补齐
+	DWORD dwBytes = ((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) / 32;
+	if(((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) % 32) {
+		dwBytes++;
+	}
+	dwBytes *= 4;
+
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	// 分配彩色数据
+
+	int i,j;
+
+	for( i = 0; i <= height - 1; i++ ){
+		for( j = 0; j <= width - 1; j++ ){
+			
+			// BMP图片数据中的坐标
+			DWORD index = i * 3 * width + 3 * j;
+			if( dwBytes % 3 != 0 ){
+				index = i * dwBytes + 3 * j ;
+			}
+			// 颜色数组中的坐标
+			DWORD resultIndex = ( height - 1 - i ) * width + j;
+			_colorData[ resultIndex ].SetRed( _lpBuf[ index  + 2 ] );
+			_colorData[ resultIndex ].SetGreen( _lpBuf[ index  + 1 ] );
+			_colorData[ resultIndex ].SetBlue( _lpBuf[ index ] );
+
+		}// for j
+	}// for i 
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 将8位彩色BMP数据转成24位颜色数据
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::BMPConvertColor8(){
+
+	// 宽度不是4的倍数则补齐
+	DWORD dwBytes = ((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) / 32;
+	if(((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) % 32) {
+		dwBytes++;
+	}
+	dwBytes *= 4;
+
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	// 分配彩色数据
+// 	if( _colorFlag == true ){
+// 		delete [] _colorData;
+// 	}
+// 	_colorData = new CBaseColorInfo[ width * height ];
+// 	_colorFlag = true;
+
+
+	int i,j;
+// 	for( i = 0; i <= 100; i++ ){
+// 		TRACE( "%d->%d,", i, _lpBuf[ i ] );
+// 	}
+// 	TRACE( "\n" );
+	for( i = 0; i <= height - 1; i++ ){
+		for( j = 0; j <= width - 1; j++ ){
+			
+			// BMP图片数据中的坐标
+			DWORD index = i * dwBytes + j ;
+
+			// 颜色数组中的坐标
+			DWORD resultIndex = ( height - 1 - i ) * width + j;
+// 			if( index >= _infoHeader.biSizeImage || resultIndex >= _infoHeader.biSizeImage ){
+// 				TRACE( "*** i = %d, j = %d, index = %d, resultIndex = %d, widht = %d, height = %d \n", 
+// 					i, j, index, resultIndex, width, height );
+// 			}
+
+// 			int red = _lpBuf[ index ] + 2;
+// 			int green = _lpBuf[ index ] + 1;
+// 			int blue = _lpBuf[ index ] + 0;
+// 
+// 			if( resultIndex <= width * height - 1 ){
+// 			_colorData[ resultIndex ].SetRed( red );
+// 			_colorData[ resultIndex ].SetGreen( green );
+// 			_colorData[ resultIndex ].SetBlue( blue );
+// 			}
+
+			_colorData[ resultIndex ].SetRed( _quad[ _lpBuf[ index ] ].rgbRed );
+			_colorData[ resultIndex ].SetGreen( _quad[ _lpBuf[ index ] ].rgbGreen );
+			_colorData[ resultIndex ].SetBlue( _quad[ _lpBuf[ index ] ].rgbBlue );
+
+// 			TRACE( "%d,%d,%d\t", _colorData[ resultIndex ].GetRed(),
+// 				_colorData[ resultIndex ].GetGreen(), 
+// 				_colorData[ resultIndex ].GetBlue() );
+
+// 			if( i <= 10 && j <= 10 ){
+// 			  TRACE( "(%d,%d,%d)->(%d,%d,%d) ", i,j,index, _colorData[ resultIndex ].GetRed(),
+// 				_colorData[ resultIndex ].GetGreen(), 
+// 				_colorData[ resultIndex ].GetBlue() );
+/*			}*/
+
+		}// for j
+	}// for i 
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 将8位灰度BMP数据转成8位灰度数据
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::BMPConvertGray8(){
+
+	// 宽度不是4的倍数则补齐
+	DWORD dwBytes = ((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) / 32;
+	if(((DWORD) _infoHeader.biWidth * _infoHeader.biBitCount) % 32) {
+		dwBytes++;
+	}
+	dwBytes *= 4;
+
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	// 分配彩色数据
+// 	if( _colorFlag == true ){
+// 		delete [] _colorData;
+// 	}
+// 	_grayData = new BYTE[ width * height ];
+// 	_grayFlag = true;
+
+
+	int i,j;
+// 	for( i = 0; i <= 100; i++ ){
+// 		TRACE( "%d->%d,", i, _lpBuf[ i ] );
+// 	}
+// 	TRACE( "\n" );
+	for( i = 0; i <= height - 1; i++ ){
+		for( j = 0; j <= width - 1; j++ ){
+			
+			// BMP图片数据中的坐标
+			DWORD index = i * dwBytes + j ;
+
+			// 颜色数组中的坐标
+			DWORD resultIndex = ( height - 1 - i ) * width + j;
+// 			if( index >= _infoHeader.biSizeImage || resultIndex >= _infoHeader.biSizeImage ){
+// 				TRACE( "*** i = %d, j = %d, index = %d, resultIndex = %d, widht = %d, height = %d \n", 
+// 					i, j, index, resultIndex, width, height );
+// 			}
+
+// 			int red = _lpBuf[ index ] + 2;
+// 			int green = _lpBuf[ index ] + 1;
+// 			int blue = _lpBuf[ index ] + 0;
+// 
+// 			if( resultIndex <= width * height - 1 ){
+// 			_colorData[ resultIndex ].SetRed( red );
+// 			_colorData[ resultIndex ].SetGreen( green );
+// 			_colorData[ resultIndex ].SetBlue( blue );
+// 			}
+
+			_grayData[ resultIndex ] = _lpBuf[ index ];
+
+
+// 			TRACE( "%d,%d,%d\t", _colorData[ resultIndex ].GetRed(),
+// 				_colorData[ resultIndex ].GetGreen(), 
+// 				_colorData[ resultIndex ].GetBlue() );
+
+// 			if( i <= 10 && j <= 10 ){
+// 			  TRACE( "(%d,%d,%d)->(%d,%d,%d) ", i,j,index, _colorData[ resultIndex ].GetRed(),
+// 				_colorData[ resultIndex ].GetGreen(), 
+// 				_colorData[ resultIndex ].GetBlue() );
+/*			}*/
+
+		}// for j
+	}// for i 
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 将8位灰度数据转成用24位颜色
+// 灰度图的RGB值均相同
+// 参数:
+//   grayData: BYTE *, 灰度数据
+//   colorData: CBaseColorInfo *, 24位颜色数据
+//   width: 图片宽度
+//   height: 图片高度
+//  返回值: 无
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::Gray8ConvertColor24( BYTE * grayData, 
+										    CBaseColorInfo * colorData, 
+											int width, 
+											int height ){
+
+
+	int length = width * height;
+	for( int i = 0; i <= length - 1; i++ ){
+		colorData[ i ].SetRed( grayData[ i ] );
+		colorData[ i ].SetGreen( grayData[ i ] );
+		colorData[ i ].SetBlue( grayData[ i ] );
+	}
+
+}
+
+// 将8位灰度数据转成用24位颜色
+void CImageStuDlg::Gray8ConvertColor24( int * grayData, CBaseColorInfo * colorData, int width, int height ){
+
+	int length = width * height;
+	for( int i = 0; i <= length - 1; i++ ){
+		colorData[ i ].SetRed( grayData[ i ] );
+		colorData[ i ].SetGreen( grayData[ i ] );
+		colorData[ i ].SetBlue( grayData[ i ] );
+	}
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 显示图像(通过图像数组,彩色图像)
+// 参数:
+//   colorData: CBaseColorInfo, 颜色数据
+//   width: int, 图像宽度
+//   height: int, 图像高度
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::ShowPicByArray( CBaseColorInfo * colorData, 
+								   int width, 
+								   int height ){
+
+	CDlgShowArray dlg;
+	// 图像数据(24位彩色图像)
+	dlg.SetColorData( colorData );
+	// 图像宽度
+	dlg.SetWidth( width );
+	// 图像高度
+	dlg.SetHeight( height );
+	// 显示对话框
+	dlg.DoModal();
+
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// 显示图像(通过图像数组, 灰度图像)
+// 参数:
+//   colorData: CBaseColorInfo, 灰度图像数据
+//   width: int, 图像宽度
+//   height: int, 图像高度
+//////////////////////////////////////////////////////////////////////////
+void CImageStuDlg::ShowPicByArray( int * grayData, 
+								   int width, 
+								   int height ){
+
+	// 将灰度图像转成彩色图像
+	CBaseColorInfo * colorData = new CBaseColorInfo[ width * height ];
+	Gray8ConvertColor24( grayData, colorData, width, height );
+
+	CDlgShowArray dlg;
+	// 图像数据(24位彩色图像)
+	dlg.SetColorData( colorData );
+	// 图像宽度
+	dlg.SetWidth( width );
+	// 图像高度
+	dlg.SetHeight( height );
+	// 显示对话框
+	dlg.DoModal();
+
+	// 释放彩色图像
+	delete [] colorData;
+
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// 功能：保存BMP图片
+// 参数：
+//   bmpName: char *, 文件名(含路径、文件后缀)
+//   imgBuf: unsigned char *, 图像数据
+//   width: int, 图像宽度
+//   height: int, 图像高度
+//   biBitCount: int, 像素深度
+//   pColorTable: RGBAUAD *, 颜色表
+//////////////////////////////////////////////////////////////////////////
+bool CImageStuDlg::SaveAsBmp( char * bmpName, 
+							  unsigned char * imgBuf, 
+							  int width, 
+							  int height,
+							  int biBitCount, 
+							  RGBQUAD * pColorTable 
+							 ){
+	
+	// 如果位图数据为空，则没有数据传入
+	if( !imgBuf ){
+		return false;
+	}
+	
+	// 颜色表大小，以字节为单位，灰度图像颜色表为1024，彩色图像颜色表大小为0
+	int colorTableSize = 0;
+	if( biBitCount == 8 ){
+		colorTableSize = 1024; // 感觉不一定正确
+	} 
+	
+	// 将带存储图像数据每行字节数转为4的倍数
+	int lineByte = ( width * biBitCount / 8 + 3 ) / 4 * 4;
+	// 以二进制的写的方式打开文件
+	FILE *fp = fopen( bmpName, "wb" );
+	if( !fp ){
+		return false;
+	}
+	
+	// 申请位图文件头结构变量，填写文件头信息
+	BITMAPFILEHEADER fileHead;
+	fileHead.bfType = 0x4D42;// bmp类型
+	// bfSize是图像文件4个组成部分之和
+	fileHead.bfSize = sizeof( BITMAPFILEHEADER ) 
+		+ sizeof( BITMAPINFOHEADER )
+		+ colorTableSize 
+		+ lineByte * height; // 图像数据字节数
+	fileHead.bfReserved1 = 0;
+	fileHead.bfReserved2 = 0;
+	
+	// bfOffBits是图像文件前三部分所需空间之和
+	fileHead.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)  + colorTableSize;
+	// 文件头写入文件
+	fwrite( &fileHead, sizeof( BITMAPFILEHEADER ) , 1, fp );
+	
+	// 申请位图信息头结构变量，填写信息头信息
+	BITMAPINFOHEADER head;
+	head.biSize = sizeof(BITMAPINFOHEADER); // 位图信息头结构的大小(40个字节)
+	head.biWidth = width;// 图像宽度，以像素为单位
+	head.biHeight = height;// 图像高度，以像素为单位
+	head.biPlanes = 1;// 必须为1
+	head.biBitCount = biBitCount; // 像素深度，每个像素的为数(bit数)
+	head.biCompression = BI_RGB; // 图像是否压缩，一般是未压缩的
+	head.biSizeImage = lineByte * height; // 实际的位图数据占据的字节数
+	head.biXPelsPerMeter = 0; // 目标设备的水平分辨率
+	head.biYPelsPerMeter = 0; // 目标设备的垂直分辨率
+	head.biClrUsed = 0; // 本图像实际用到的颜色数
+	head.biClrImportant = 0; // 本图像重要的颜色，如果为0，则所有的颜色均重要 
+	
+	// 写位图信息头进内存
+	fwrite( &head, sizeof( BITMAPINFOHEADER ), 1, fp );
+	
+	// 如果图像时灰度图像，有颜色表，写入文件
+	if( biBitCount == 8 ){
+		fwrite( pColorTable, sizeof( RGBQUAD ), 256, fp );
+	}
+	
+	// 写位图数据进文件
+	fwrite( imgBuf, height * lineByte, 1, fp );
+	
+	// 关闭文件
+	fclose( fp );
+	
+	return true;
+	
+}
+
+
+
+
+
+
+void CImageStuDlg::OnFullRed()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = 800;
+	int height = 600;
+	///生成图像
+	CBaseColorInfo * img = new CBaseColorInfo[width * height];
+	//数据
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			img[index] = CBaseColorInfo(255, 0, 0);
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//释放
+	delete[] img;
+	//MessageBox("test");
+}
+
+
+void CImageStuDlg::OnColorGray()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	//生成图像
+	CBaseColorInfo * img = new CBaseColorInfo[size];
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			CBaseColorInfo oldInfo = _colorData[index];
+			int gray = 0.299 * oldInfo.GetRed()
+				+ 0.587 * oldInfo.GetGreen()
+				+ 0.114 * oldInfo.GetBlue();
+			CBaseColorInfo newInfo = CBaseColorInfo(
+				gray, gray, gray
+			);
+			img[index] = newInfo;
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//释放
+	delete[] img;
+}
+
+
+void CImageStuDlg::OnRedBlue()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = 800;
+	int height = 600;
+	///生成图像
+	CBaseColorInfo * img = new CBaseColorInfo[width * height];
+	//数据
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			if (((x / 40) % 2 + (y / 30) % 2) % 2) {
+				img[index] = CBaseColorInfo(255, 0, 0);
+			}
+			else {
+				img[index] = CBaseColorInfo(0, 0, 255);
+			}
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//释放
+	delete[] img;
+	//MessageBox("test");
+}
+
+
+void CImageStuDlg::OnGreyWb()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	//生成图像
+	int * img = new int[size];
+	//设置阈值
+	int limit = 125;
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			int oldGray = _grayData[index];
+			int newGray = oldGray;
+			if (oldGray > limit) {
+				newGray = 255;
+			}
+			else newGray = 0;
+			img[index] = newGray;
+		}
+	}
+	
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//释放
+	delete[] img;
+}
+
