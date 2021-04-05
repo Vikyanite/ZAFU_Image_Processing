@@ -111,13 +111,22 @@
 #define ID_32865                        32865
 #define ID_LINEAR_INTERPOLATION         32866
 #define ID_DOUBLE_LINEAR_INTERPOLATION  32867
+#define ID_32868                        32868
+#define ID_GRAY_NEGATUVE                32869
+#define ID_GRAY_NEGATIVE                32870
+#define ID_32871                        32871
+#define ID_GRAY_LOG                     32872
+#define ID_32873                        32873
+#define ID_GRAY_POWER                   32874
+#define ID_32875                        32875
+#define ID_GRAY_SEG                     32876
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32868
+#define _APS_NEXT_COMMAND_VALUE         32877
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

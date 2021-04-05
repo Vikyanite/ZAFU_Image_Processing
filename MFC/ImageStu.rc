@@ -217,6 +217,13 @@ BEGIN
         MENUITEM "后向映射",                        ID_ON_ZOOM_BACKWARD
         MENUITEM "双线性插值",                       ID_DOUBLE_LINEAR_INTERPOLATION
     END
+    POPUP "实验三"
+    BEGIN
+        MENUITEM "灰度取反",                        ID_GRAY_NEGATIVE
+        MENUITEM "对数变换",                        ID_GRAY_LOG
+        MENUITEM "幂次变换",                        ID_GRAY_POWER
+        MENUITEM "分段函数",                        ID_GRAY_SEG
+    END
 END
 
 

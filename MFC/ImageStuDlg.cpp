@@ -8,7 +8,7 @@
 #include "DlgTask.h"
 #include <atlimage.h>
 #include <afxole.h>
-
+#include <cmath>
 
 #include <sstream>
 
@@ -111,6 +111,10 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_ON_ZOOM_FORWARD, &CImageStuDlg::OnOnZoomForward)
 	ON_COMMAND(ID_ON_ZOOM_BACKWARD, &CImageStuDlg::OnOnZoomBackward)
 	ON_COMMAND(ID_DOUBLE_LINEAR_INTERPOLATION, &CImageStuDlg::OnDoubleLinearInterpolation)
+	ON_COMMAND(ID_GRAY_NEGATIVE, &CImageStuDlg::OnGrayNegative)
+	ON_COMMAND(ID_GRAY_LOG, &CImageStuDlg::OnGrayLog)
+	ON_COMMAND(ID_GRAY_POWER, &CImageStuDlg::OnGrayPower)
+	ON_COMMAND(ID_GRAY_SEG, &CImageStuDlg::OnGraySeg)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1346,6 +1350,117 @@ void CImageStuDlg::OnDoubleLinearInterpolation()
 
 			img[newIndex] = newGray;
 		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//灰度取反
+void CImageStuDlg::OnGrayNegative()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int rule[GRAY_LEVEL_256] = { 0 };
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		rule[i] = 255 - i;
+	}
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			img[index] = rule[_grayData[index]];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//对数变换
+void CImageStuDlg::OnGrayLog()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int rule[GRAY_LEVEL_256] = { 0 };
+	int factor = 100;
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		rule[i] = factor * log(i + 0.5);
+	}
+	double k = 255.0 / (double)rule[255];
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			img[index] = rule[_grayData[index]] * k;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//幂次变换
+void CImageStuDlg::OnGrayPower()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int rule[GRAY_LEVEL_256] = { 0 };
+	int factor = 100;
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		rule[i] = factor * pow(i, 3);
+	}
+	double k = 255.0 / (double)rule[255];
+	for (int i = 0; i < size; ++i) {
+		img[i] = k * rule[_grayData[i]];
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnGraySeg()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int rule[GRAY_LEVEL_256] = { 0 };
+	int range1 = 100;
+	int range2 = 200;
+	int factor = 100;
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		if (i < range1) {
+			
+			rule[i] = i;
+		}
+		else if (i < range2) {
+			rule[i] = factor * log(i-100);
+		}
+		else {
+			rule[i] = pow(i, 0.3);
+		}
+	}
+
+	for (int i = 0; i < size; ++i) {
+		img[i] = rule[_grayData[i]];
 	}
 
 	ShowPicByArray(img, width, height);

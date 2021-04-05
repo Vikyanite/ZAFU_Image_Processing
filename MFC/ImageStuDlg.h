@@ -125,6 +125,10 @@ public:
 	afx_msg void OnOnZoomBackward();
 	afx_msg void OnLinearInterpolation();
 	afx_msg void OnDoubleLinearInterpolation();
+	afx_msg void OnGrayNegative();
+	afx_msg void OnGrayLog();
+	afx_msg void OnGrayPower();
+	afx_msg void OnGraySeg();
 };
 
 //{{AFX_INSERT_LOCATION}}
