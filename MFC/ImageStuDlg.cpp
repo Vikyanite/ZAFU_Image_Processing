@@ -102,6 +102,15 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_COLOR_GRAY, &CImageStuDlg::OnColorGray)
 	ON_COMMAND(ID_RED_BLUE, &CImageStuDlg::OnRedBlue)
 	ON_COMMAND(ID_GREY_WB, &CImageStuDlg::OnGreyWb)
+
+	ON_COMMAND(ID_GRAY_LEVEL, &CImageStuDlg::OnGrayLevel)
+	ON_COMMAND(ID_MIRROR_HORIZONTALLY, &CImageStuDlg::OnMirrorHorizontally)
+	ON_COMMAND(ID_MIRROR_VERTICALLY, &CImageStuDlg::OnMirrorVertically)
+	ON_COMMAND(ID_TRANSPOSITION, &CImageStuDlg::OnTransposition)
+	ON_COMMAND(ID_GRAY_LEVEL_COLORFUL_VERSION, &CImageStuDlg::OnGrayLevelColorfulVersion)
+	ON_COMMAND(ID_ON_ZOOM_FORWARD, &CImageStuDlg::OnOnZoomForward)
+	ON_COMMAND(ID_ON_ZOOM_BACKWARD, &CImageStuDlg::OnOnZoomBackward)
+	ON_COMMAND(ID_DOUBLE_LINEAR_INTERPOLATION, &CImageStuDlg::OnDoubleLinearInterpolation)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1026,7 +1035,6 @@ void CImageStuDlg::OnColorGray()
 	delete[] img;
 }
 
-
 void CImageStuDlg::OnRedBlue()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -1054,7 +1062,6 @@ void CImageStuDlg::OnRedBlue()
 	//MessageBox("test");
 }
 
-
 void CImageStuDlg::OnGreyWb()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -1064,7 +1071,7 @@ void CImageStuDlg::OnGreyWb()
 	//生成图像
 	int * img = new int[size];
 	//设置阈值
-	int limit = 125;
+	int limit = 140;
 	for (int x = 0; x < width; ++x) {
 		for (int y = 0; y < height; ++y) {
 			int index = y * width + x;
@@ -1085,3 +1092,264 @@ void CImageStuDlg::OnGreyWb()
 	delete[] img;
 }
 
+//灰度图像灰度级分辨率
+void CImageStuDlg::OnGrayLevel()
+{
+	//创建图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int * img = new int[size];
+
+	//计算
+	int level_count = 8; //代表灰度级数
+	int step = GRAY_LEVEL_256 / level_count;
+	int rule[GRAY_LEVEL_256] = { 0 };
+
+	///这种就比较快，因为灰度只有256级，每个你都做个映射就好了
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		rule[i] = int(i / step) * step;
+	}
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		img[i] = rule[gray];
+	}
+	/*
+	这种方式计算量为 像素点*2，在像素点教多的情况下会比较慢，所以可以空间换时间
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		img[i] = int(gray / step) * step;
+	}
+	*/
+	//显示
+	ShowPicByArray(img, width, height);
+	//删除资源
+	if (img != NULL)
+		delete[] img;
+
+}
+
+void CImageStuDlg::OnGrayLevelColorfulVersion()
+{
+	//创建图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo * img = new CBaseColorInfo[width * height];
+
+	//计算
+	int level_count = 8; //代表灰度级数
+	int COLOR_LEVEL = 256;
+	int step = COLOR_LEVEL / level_count;
+
+	//这种方式计算量为 像素点*2，在像素点教多的情况下会比较慢，所以可以空间换时间
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			CBaseColorInfo oldInfo = _colorData[index];
+			CBaseColorInfo newInfo = CBaseColorInfo(
+				int((oldInfo.GetRed()+50) / step) * step, 
+				int((oldInfo.GetGreen()+75) / step) * step, 
+				int((oldInfo.GetBlue()+150) / step) * step
+			);
+			img[index] = newInfo;
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+	//删除资源
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnMirrorHorizontally()
+{
+	//创建图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int * img = new int[size];
+
+	// 水平镜像
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			//对称坐标
+			int oldX = width - 1 - x;
+			int oldY = y;
+			int oldIndex = oldY * width + oldX;
+			int oldGray = _grayData[oldIndex];
+			img[index] = oldGray;
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+	//删除资源
+	if (img != NULL)
+		delete[] img;
+
+}
+
+void CImageStuDlg::OnMirrorVertically()
+{
+	//创建图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int * img = new int[size];
+
+	// 垂直镜像
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = y * width + x;
+			//对称坐标
+			int oldX = x;
+			int oldY = height - 1 - y;
+			int oldIndex = oldY * width + oldX;
+			int oldGray = _grayData[oldIndex];
+			img[index] = oldGray;
+		}
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+	//删除资源
+	if (img != NULL)
+		delete[] img;
+}
+
+void CImageStuDlg::OnTransposition()
+{
+	//创建图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int * img = new int[size];
+
+	// 转置
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int index = x * height + y;
+			//对称坐标
+			int oldX = width - x;
+			int oldY =  y;
+			int oldIndex = oldY * width + oldX;
+			int oldGray = _grayData[oldIndex];
+			img[index] = oldGray;
+		}
+	}
+	//显示
+	ShowPicByArray(img, height, width);
+	//删除资源
+	if (img != NULL)
+		delete[] img;
+}
+
+
+
+//前向映射
+void CImageStuDlg::OnOnZoomForward()
+{
+	double scale = 1.2;
+	int oldwidth = _infoHeader.biWidth;
+	int oldheight = _infoHeader.biHeight;
+	int width = oldwidth * scale;
+	int height = oldheight * scale;
+	int size = width * height;
+	int *img = new int[size];
+
+	for (int x = 0; x < oldwidth; ++x) {
+		for (int y = 0; y < oldheight; ++y) {
+			int oldIndex = y * oldwidth + x;
+			int newX = x * scale;
+			int newY = y * scale;
+			int newIndex = newY * width + newX;
+			img[newIndex] = _grayData[oldIndex];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnOnZoomBackward()
+{
+	double scale = 2.0;
+	int oldwidth = _infoHeader.biWidth;
+	int oldheight = _infoHeader.biHeight;
+	int width = oldwidth * scale;
+	int height = oldheight * scale;
+	int size = width * height;
+	int *img = new int[size];
+
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int newIndex = y * width + x;
+			int oldX = x / scale;
+			int oldY = y / scale;
+			int oldIndex = oldY * oldwidth + oldX;
+			img[newIndex] = _grayData[oldIndex];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//二次线性插值
+void CImageStuDlg::OnDoubleLinearInterpolation()
+{
+	double scale = 2.0;
+	int oldwidth = _infoHeader.biWidth;
+	int oldheight = _infoHeader.biHeight;
+	int width = oldwidth * scale;
+	int height = oldheight * scale;
+	int size = width * height;
+	int *img = new int[size];
+
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			int newIndex = y * width + x;
+			double oldX = x / scale;
+			double oldY = y / scale;
+			//ga
+			int aX = oldX;
+			int aY = oldY;
+			int aIndex = aY * oldwidth + aX;
+			int ga = _grayData[aIndex];
+			//gb
+			int bX = min(oldX + 1, oldwidth-1);
+			int bY = oldY;
+			int bIndex = bY * oldwidth + bX;
+			int gb = _grayData[bIndex];
+			//ge
+			double ge = (oldX - aX) * (gb - ga) + ga;
+			//gc
+			int cX = oldX;
+			int cY = min(oldY + 1, oldheight-1);
+			int cIndex = cY * oldwidth + cX;
+			int gc = _grayData[cIndex];
+			//gd
+			int dX = min(oldX + 1, oldwidth-1);
+			int dY = min(oldY + 1, oldheight-1);
+			int dIndex = dY * oldwidth + dX;
+			int gd = _grayData[dIndex];
+			//gf
+			double gf = (oldX - cX) * (gd - gc) + gc;
+
+			int newGray = (oldY - aY) * (gf - ge) + ge;
+
+			img[newIndex] = newGray;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}

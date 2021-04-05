@@ -206,6 +206,17 @@ BEGIN
         MENUITEM "红蓝交替",                        ID_RED_BLUE
         MENUITEM "灰度转黑白",                       ID_GREY_WB
     END
+    POPUP "实验二"
+    BEGIN
+        MENUITEM "灰度级分辨率",                      ID_GRAY_LEVEL
+        MENUITEM "灰度级分辨率（彩色版）",                 ID_GRAY_LEVEL_COLORFUL_VERSION
+        MENUITEM "水平镜像",                        ID_MIRROR_HORIZONTALLY
+        MENUITEM "垂直镜像",                        ID_MIRROR_VERTICALLY
+        MENUITEM "转置",                          ID_TRANSPOSITION
+        MENUITEM "前向映射",                        ID_ON_ZOOM_FORWARD
+        MENUITEM "后向映射",                        ID_ON_ZOOM_BACKWARD
+        MENUITEM "双线性插值",                       ID_DOUBLE_LINEAR_INTERPOLATION
+    END
 END
 
 

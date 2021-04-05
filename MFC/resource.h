@@ -92,13 +92,32 @@
 #define ID_32846                        32846
 #define ID_CENTER_REC                   32847
 #define ID_CENTER_CIRCLE                32848
+#define ID_32849                        32849
+#define ID_32850                        32850
+#define ID_GRAY_LEVEL                   32851
+#define ID_32852                        32852
+#define ID_                             32853
+#define ID_MIRROR_HORIZONTALLY          32854
+#define ID_32855                        32855
+#define ID_MIRROR_VERTICALLY            32856
+#define ID_32857                        32857
+#define ID_TRANSPOSITION                32858
+#define ID_32859                        32859
+#define ID_GRAY_LEVEL_COLORFUL_VERSION  32860
+#define ID_32861                        32861
+#define ID_ON_ZOOM_FORWARD              32862
+#define ID_32863                        32863
+#define ID_ON_ZOOM_BACKWARD             32864
+#define ID_32865                        32865
+#define ID_LINEAR_INTERPOLATION         32866
+#define ID_DOUBLE_LINEAR_INTERPOLATION  32867
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32849
+#define _APS_NEXT_COMMAND_VALUE         32868
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

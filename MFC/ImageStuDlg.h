@@ -115,6 +115,16 @@ public:
 	afx_msg void OnColorGray();
 	afx_msg void OnRedBlue();
 	afx_msg void OnGreyWb();
+	afx_msg void On32849();
+	afx_msg void OnGrayLevel();
+	afx_msg void OnMirrorHorizontally();
+	afx_msg void OnMirrorVertically();
+	afx_msg void OnTransposition();
+	afx_msg void OnGrayLevelColorfulVersion();
+	afx_msg void OnOnZoomForward();
+	afx_msg void OnOnZoomBackward();
+	afx_msg void OnLinearInterpolation();
+	afx_msg void OnDoubleLinearInterpolation();
 };
 
 //{{AFX_INSERT_LOCATION}}
