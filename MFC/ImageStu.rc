@@ -224,6 +224,10 @@ BEGIN
         MENUITEM "幂次变换",                        ID_GRAY_POWER
         MENUITEM "分段函数",                        ID_GRAY_SEG
     END
+    POPUP "实验四"
+    BEGIN
+        MENUITEM "均平化",                         ID_JUNPINGHUA
+    END
 END
 
 

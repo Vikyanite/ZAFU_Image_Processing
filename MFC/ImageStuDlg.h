@@ -129,6 +129,7 @@ public:
 	afx_msg void OnGrayLog();
 	afx_msg void OnGrayPower();
 	afx_msg void OnGraySeg();
+	afx_msg void OnJunpinghua();
 };
 
 //{{AFX_INSERT_LOCATION}}

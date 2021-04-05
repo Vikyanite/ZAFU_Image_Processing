@@ -115,6 +115,7 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_GRAY_LOG, &CImageStuDlg::OnGrayLog)
 	ON_COMMAND(ID_GRAY_POWER, &CImageStuDlg::OnGrayPower)
 	ON_COMMAND(ID_GRAY_SEG, &CImageStuDlg::OnGraySeg)
+	ON_COMMAND(ID_JUNPINGHUA, &CImageStuDlg::OnJunpinghua)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1459,6 +1460,67 @@ void CImageStuDlg::OnGraySeg()
 		}
 	}
 
+	for (int i = 0; i < size; ++i) {
+		img[i] = rule[_grayData[i]];
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//均平化
+void CImageStuDlg::OnJunpinghua()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	//计算映射规则
+	int rule[GRAY_LEVEL_256] = { 0 };
+
+	//直方图
+	int zhifangtu[GRAY_LEVEL_256] = { 0 };
+	for (int i = 0; i < size; ++i) {
+		zhifangtu[_grayData[i]]++;
+	}
+	/*
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		CString str;
+		str.Format("%d, %d\n", i, zhifangtu[i]);
+		::OutputDebugString(str);
+	}
+	 */
+	//归一化
+	double guiyihua[GRAY_LEVEL_256] = { 0.0 };
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		guiyihua[i] = zhifangtu[i] * 1.0 / (double)size;
+	}
+	/*
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		CString str;
+		str.Format("%d, %lf\n", i, guiyihua[i]);
+		::OutputDebugString(str);
+	}
+	*/
+	// 累积
+	double leiji[GRAY_LEVEL_256] = { 0,0 };
+	leiji[0] = guiyihua[0];
+	for (int i = 1; i < GRAY_LEVEL_256; ++i) {
+		leiji[i] = guiyihua[i] + leiji[i - 1];
+	}
+	/*
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		CString str;
+		str.Format("%d, %lf\n", i, leiji[i]);
+		::OutputDebugString(str);
+	}
+	*/
+	for (int i = 0; i < GRAY_LEVEL_256; ++i) {
+		rule[i] = (int)(leiji[i] * (GRAY_LEVEL_256 - 1) + 0.5);
+	}
 	for (int i = 0; i < size; ++i) {
 		img[i] = rule[_grayData[i]];
 	}
