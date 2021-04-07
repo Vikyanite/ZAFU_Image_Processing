@@ -116,6 +116,10 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_GRAY_POWER, &CImageStuDlg::OnGrayPower)
 	ON_COMMAND(ID_GRAY_SEG, &CImageStuDlg::OnGraySeg)
 	ON_COMMAND(ID_JUNPINGHUA, &CImageStuDlg::OnJunpinghua)
+	ON_COMMAND(ID_AVERAGE_FILTER, &CImageStuDlg::OnAverageFilter)
+	ON_COMMAND(ID_CENTER_MOSAC, &CImageStuDlg::OnCenterMosac)
+	ON_COMMAND(ID_WEIGHT_AVERAGE, &CImageStuDlg::OnWeightAverage)
+	ON_COMMAND(ID_FAST_WEIGHT_AVERAGE, &CImageStuDlg::OnFastWeightAverage)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1529,4 +1533,122 @@ void CImageStuDlg::OnJunpinghua()
 
 	if (img != NULL)
 		delete[] img;
+}
+
+//邻域平均
+void CImageStuDlg::OnAverageFilter()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int N = 20;
+	int radius = N / 2;
+	int factor = N * N;
+	for (int x = radius; x < width - radius; ++ x) {
+		for (int y = radius; y < height - radius; ++ y) {
+			int index = y * width + x;
+			//取邻域，求和
+			int sum = 0;
+			for (int m = x - radius; m <= x + radius; ++ m) {
+				for (int n = y - radius; n <= y + radius; ++ n) {
+					int oldIndex = n * width + m;
+					sum += _grayData[oldIndex];
+				}
+			}
+			int gray = sum / (factor);
+			img[index] = gray;
+		}
+	}
+	
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//中心马赛克
+void CImageStuDlg::OnCenterMosac()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int N = 40;
+	int radius = N / 2;
+	int factor = N * N;
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			img[y * width + x] = _grayData[y * width + x];
+		}
+	}
+	for (int x = width / 4 + radius; x < width * 3 / 4 - radius; ++x) {
+		for (int y = height / 4 + radius; y < height * 3 / 4 - radius; ++y) {
+			int index = y * width + x;
+			//取邻域，求和
+			int sum = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				for (int n = y - radius; n <= y + radius; ++n) {
+					int oldIndex = n * width + m;
+					sum += _grayData[oldIndex];
+				}
+			}
+			int gray = sum / (factor);
+			img[index] = gray;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//加权平均
+void CImageStuDlg::OnWeightAverage()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int N = 3;
+	int radius = N / 2;
+	int factor = N * N;
+	int model[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1};
+	int neighbor[9] = {0};
+	for (int x = radius; x < width - radius; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int index = y * width + x;
+			//取邻域
+			int order = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				for (int n = y - radius; n <= y + radius; ++n) {
+					int oldIndex = n * width + m;
+					neighbor[order++] = _grayData[oldIndex];
+
+				}
+			}
+			//求和
+			int sum = 0;
+			for (int i = 0; i < 9; ++ i) {
+				sum += neighbor[i] * model[i];
+			}
+			int gray = sum / 16;
+			img[index] = gray;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//(www偷懒了没实现快速加权平均
+void CImageStuDlg::OnFastWeightAverage()
+{
+	// TODO: 在此添加命令处理程序代码
 }

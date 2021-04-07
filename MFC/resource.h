@@ -122,13 +122,23 @@
 #define ID_GRAY_SEG                     32876
 #define ID_32877                        32877
 #define ID_JUNPINGHUA                   32878
+#define ID_32879                        32879
+#define ID_32880                        32880
+#define ID_Menu32881                    32881
+#define ID_AVERAGE_FILTER               32882
+#define ID_32883                        32883
+#define ID_CENTER_MOSAC                 32884
+#define ID_32885                        32885
+#define ID_WEIGHT_AVERAGE               32886
+#define ID_32887                        32887
+#define ID_FAST_WEIGHT_AVERAGE          32888
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32879
+#define _APS_NEXT_COMMAND_VALUE         32889
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

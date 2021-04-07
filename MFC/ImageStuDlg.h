@@ -130,6 +130,10 @@ public:
 	afx_msg void OnGrayPower();
 	afx_msg void OnGraySeg();
 	afx_msg void OnJunpinghua();
+	afx_msg void OnAverageFilter();
+	afx_msg void OnCenterMosac();
+	afx_msg void OnWeightAverage();
+	afx_msg void OnFastWeightAverage();
 };
 
 //{{AFX_INSERT_LOCATION}}

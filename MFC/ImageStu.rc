@@ -228,6 +228,14 @@ BEGIN
     BEGIN
         MENUITEM "均平化",                         ID_JUNPINGHUA
     END
+    POPUP "实验五"
+    BEGIN
+        MENUITEM "邻域平均",                        ID_AVERAGE_FILTER
+        MENUITEM "中心马赛克",                       ID_CENTER_MOSAC
+        MENUITEM "加权平均",                        ID_WEIGHT_AVERAGE
+        MENUITEM "快速加权平均",                      ID_FAST_WEIGHT_AVERAGE
+    END
+    MENUITEM SEPARATOR
 END
 
 
