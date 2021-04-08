@@ -132,13 +132,23 @@
 #define ID_WEIGHT_AVERAGE               32886
 #define ID_32887                        32887
 #define ID_FAST_WEIGHT_AVERAGE          32888
+#define ID_32889                        32889
+#define ID_2D_MIDDLE                    32890
+#define ID_32891                        32891
+#define ID_FAST_AVERAGE                 32892
+#define ID_32893                        32893
+#define ID_FAST_WEIGHT                  32894
+#define ID_32895                        32895
+#define ID_32896                        32896
+#define ID_2D_MIDDLE_TEN                32897
+#define ID_2D_MIDDLE_CROSS              32898
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32889
+#define _APS_NEXT_COMMAND_VALUE         32899
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

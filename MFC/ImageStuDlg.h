@@ -133,7 +133,11 @@ public:
 	afx_msg void OnAverageFilter();
 	afx_msg void OnCenterMosac();
 	afx_msg void OnWeightAverage();
-	afx_msg void OnFastWeightAverage();
+	afx_msg void On2dMiddle();
+	afx_msg void OnFastAverage();
+	afx_msg void OnFastWeight();
+	afx_msg void On2dMiddleTen();
+	afx_msg void On2dMiddleCross();
 };
 
 //{{AFX_INSERT_LOCATION}}

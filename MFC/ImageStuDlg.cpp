@@ -9,7 +9,8 @@
 #include <atlimage.h>
 #include <afxole.h>
 #include <cmath>
-
+#include <algorithm>
+#include <iostream>
 #include <sstream>
 
 #ifdef _DEBUG
@@ -119,7 +120,11 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_AVERAGE_FILTER, &CImageStuDlg::OnAverageFilter)
 	ON_COMMAND(ID_CENTER_MOSAC, &CImageStuDlg::OnCenterMosac)
 	ON_COMMAND(ID_WEIGHT_AVERAGE, &CImageStuDlg::OnWeightAverage)
-	ON_COMMAND(ID_FAST_WEIGHT_AVERAGE, &CImageStuDlg::OnFastWeightAverage)
+	ON_COMMAND(ID_2D_MIDDLE, &CImageStuDlg::On2dMiddle)
+	ON_COMMAND(ID_FAST_AVERAGE, &CImageStuDlg::OnFastAverage)
+	ON_COMMAND(ID_FAST_WEIGHT, &CImageStuDlg::OnFastWeight)
+	ON_COMMAND(ID_2D_MIDDLE_TEN, &CImageStuDlg::On2dMiddleTen)
+	ON_COMMAND(ID_2D_MIDDLE_CROSS, &CImageStuDlg::On2dMiddleCross)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1543,7 +1548,7 @@ void CImageStuDlg::OnAverageFilter()
 	int size = width * height;
 	int *img = new int[size];
 
-	int N = 20;
+	int N = 10;
 	int radius = N / 2;
 	int factor = N * N;
 	for (int x = radius; x < width - radius; ++ x) {
@@ -1647,8 +1652,210 @@ void CImageStuDlg::OnWeightAverage()
 		delete[] img;
 }
 
-//(www偷懒了没实现快速加权平均
-void CImageStuDlg::OnFastWeightAverage()
+
+//快速邻域平均
+void CImageStuDlg::OnFastAverage()
 {
-	// TODO: 在此添加命令处理程序代码
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int *horizontal = new int[size];
+	for (int i = 0; i < size; ++i) {
+		horizontal[i] = _grayData[i];
+	}
+
+	int N = 5;
+	int radius = N / 2;
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = radius; x < width - radius; ++x) {
+			int sum = 0;
+			int n = y;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				int index = n * width + m;
+				sum += _grayData[index];
+			}
+			int horizontal_index = y * width + x;
+			horizontal[horizontal_index] = sum / N;
+		}
+	}
+
+	for (int x = 0; x < width; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int sum = 0;
+			int m = x;
+			for (int n = y - radius; n <= y + radius; ++n) {
+				int index = n * width + m;
+				sum += horizontal[index];
+			}
+			int result_index = y * width + x;
+			img[result_index] = sum / N;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//快速加权平均
+void CImageStuDlg::OnFastWeight()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int *horizontal = new int[size];
+	for (int i = 0; i < size; ++i) {
+		horizontal[i] = _grayData[i];
+	}
+
+	int N = 5;
+	int radius = N / 2;
+	int weight[] = {1,1,2,4,6,10,6,4,2,1,1};
+	for (int y = 0; y < height; ++y) {
+		for (int x = radius; x < width - radius; ++x) {
+			int sum = 0;
+			int n = y;
+			int order = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				int index = n * width + m;
+				sum += _grayData[index] * weight[order++];
+			}
+			int horizontal_index = y * width + x;
+			horizontal[horizontal_index] = sum / 38/*权值重数组和*/;
+		}
+	}
+
+	for (int x = 0; x < width; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int sum = 0;
+			int m = x;
+			int order = 0;
+			for (int n = y - radius; n <= y + radius; ++n) {
+				int index = n * width + m;
+				sum += horizontal[index] * weight[order++];
+			}
+			int result_index = y * width + x;
+			img[result_index] = sum / N;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//2D中值(周围)
+void CImageStuDlg::On2dMiddle()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int radius = 2;
+	int neighbor[1000] = { 0 };
+	int neighborsz = (2 * radius + 1)*(2 * radius + 1);
+	for (int x = radius; x < width - radius; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int index = y * width + x;
+			//取邻域
+			int order = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				for (int n = y - radius; n <= y + radius; ++n) {
+					int oldIndex = n * width + m;
+					neighbor[order++] = _grayData[oldIndex];
+				}
+			}
+			//排序
+			std::stable_sort(neighbor, neighbor + neighborsz);
+			//赋值
+			img[index] = neighbor[neighborsz / 2];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+void CImageStuDlg::On2dMiddleTen()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int radius = 2;
+	int neighbor[1000] = { 0 };
+	int neighborsz = 2 * 2 * radius - 1;
+	for (int x = radius; x < width - radius; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int index = y * width + x;
+			//取邻域(十字
+			int order = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				int oldIndex = y * width + m;
+				neighbor[order++] = _grayData[oldIndex];
+			}
+			for (int n = y - radius; n <= y + radius; ++n) {
+				int oldIndex = n * width + x;
+				if (n == y) continue;
+				neighbor[order++] = _grayData[oldIndex];
+			}
+			//排序
+			std::stable_sort(neighbor, neighbor + neighborsz);
+			//赋值
+			img[index] = neighbor[neighborsz / 2];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+void CImageStuDlg::On2dMiddleCross()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int radius = 2;
+	int neighbor[1000] = { 0 };
+	int neighborsz = 2 * 2 * radius - 1;
+	for (int x = radius; x < width - radius; ++x) {
+		for (int y = radius; y < height - radius; ++y) {
+			int index = y * width + x;
+			//取邻域(交叉
+			int order = 0;
+			for (int m = x - radius; m <= x + radius; ++m) {
+				int oldIndex = (y + (m - x)) * width + m;
+				neighbor[order++] = _grayData[oldIndex];
+			}
+			for (int n = y - radius; n <= y + radius; ++n) {
+				int oldIndex = n * width + x - (n - y);
+				if (n == y) continue;
+				neighbor[order++] = _grayData[oldIndex];
+			}
+			//排序
+			std::stable_sort(neighbor, neighbor + neighborsz);
+			//赋值
+			img[index] = neighbor[neighborsz / 2];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
 }

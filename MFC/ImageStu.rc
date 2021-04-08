@@ -233,9 +233,15 @@ BEGIN
         MENUITEM "邻域平均",                        ID_AVERAGE_FILTER
         MENUITEM "中心马赛克",                       ID_CENTER_MOSAC
         MENUITEM "加权平均",                        ID_WEIGHT_AVERAGE
-        MENUITEM "快速加权平均",                      ID_FAST_WEIGHT_AVERAGE
+        MENUITEM "快速邻域平均",                      ID_FAST_AVERAGE
+        MENUITEM "快速加权平均",                      ID_FAST_WEIGHT
     END
-    MENUITEM SEPARATOR
+    POPUP "实验六"
+    BEGIN
+        MENUITEM "2D中值滤波（周围）",                  ID_2D_MIDDLE
+        MENUITEM "2D中值滤波（十字）",                  ID_2D_MIDDLE_TEN
+        MENUITEM "2D中值滤波（交叉）",                  ID_2D_MIDDLE_CROSS
+    END
 END
 
 
