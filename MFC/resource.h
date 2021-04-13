@@ -142,13 +142,22 @@
 #define ID_32896                        32896
 #define ID_2D_MIDDLE_TEN                32897
 #define ID_2D_MIDDLE_CROSS              32898
+#define ID_32899                        32899
+#define ID_LAPLACIAN                    32900
+#define ID_32901                        32901
+#define ID_Robert                       32902
+#define ID_32903                        32903
+#define ID_Menu32904                    32904
+#define ID_Sobel                        32905
+#define ID_32906                        32906
+#define ID_Wallis                       32907
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32899
+#define _APS_NEXT_COMMAND_VALUE         32908
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

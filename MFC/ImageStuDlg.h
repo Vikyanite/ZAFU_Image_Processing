@@ -138,6 +138,10 @@ public:
 	afx_msg void OnFastWeight();
 	afx_msg void On2dMiddleTen();
 	afx_msg void On2dMiddleCross();
+	afx_msg void OnLaplacian();
+	afx_msg void OnRobert();
+	afx_msg void OnSobel();
+	afx_msg void OnWallis();
 };
 
 //{{AFX_INSERT_LOCATION}}

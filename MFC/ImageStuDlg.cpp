@@ -125,6 +125,10 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_FAST_WEIGHT, &CImageStuDlg::OnFastWeight)
 	ON_COMMAND(ID_2D_MIDDLE_TEN, &CImageStuDlg::On2dMiddleTen)
 	ON_COMMAND(ID_2D_MIDDLE_CROSS, &CImageStuDlg::On2dMiddleCross)
+	ON_COMMAND(ID_LAPLACIAN, &CImageStuDlg::OnLaplacian)
+	ON_COMMAND(ID_Robert, &CImageStuDlg::OnRobert)
+	ON_COMMAND(ID_Sobel, &CImageStuDlg::OnSobel)
+	ON_COMMAND(ID_Wallis, &CImageStuDlg::OnWallis)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1851,6 +1855,162 @@ void CImageStuDlg::On2dMiddleCross()
 			std::stable_sort(neighbor, neighbor + neighborsz);
 			//赋值
 			img[index] = neighbor[neighborsz / 2];
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+//拉普拉斯算子
+void CImageStuDlg::OnLaplacian()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+	int dic[8][2] = {1,0, 0,1, -1,0, -1,1, 0,-1, 1,-1, 1,1, -1,-1};
+	for (int x = 1; x < width - 1; ++ x) {
+		for (int y = 1; y < height - 1; ++ y) {
+			int index = y * width + x;
+			int gray = -8 * _grayData[index];
+			for (int k = 0; k < 8; ++k) {
+				int _pos = (y + dic[k][0]) * width + x + dic[k][1];
+				gray += _grayData[_pos];
+			}
+			if (gray < 0) gray = -gray;
+			img[index] = gray;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnRobert()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+	
+	int neighbor[4] = { 0 };
+
+	int model_x[4] = { -1, 0, 0, 1 };
+
+	int model_y[4] = { 0, -1, 1, 0 };
+
+	for (int x = 1; x < width - 1; ++x) {
+		for (int y = 1; y < height - 1; ++y) {
+			int order = 0;
+			for (int m = x; m <= x + 1; ++m) {
+				for (int n = y; n <= y + 1; ++n) {
+					int tempIndex = n * width + m;
+					neighbor[order] = _grayData[tempIndex];
+					++order;
+				}
+			}
+			int index = y * width + x;
+
+			int sum_x = 0;
+			for (int i = 0; i < 4; ++i) {
+				sum_x += neighbor[i] * model_x[i];
+			}
+			if (sum_x < 0) sum_x = -sum_x;
+			int sum_y = 0;
+			for (int i = 0; i < 4; ++i) {
+				sum_y += neighbor[i] * model_y[i];
+			}
+			if (sum_y < 0) sum_y = -sum_y;
+
+			img[index] = sum_x + sum_y;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnSobel()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int neighbor[9] = { 0 };
+
+	int model_x[9] = { -1, -2, -1,
+						0, 0, 0,
+						1, 2, 1  };
+
+	int model_y[9] = { -1, 0, 1,
+						-2, 0, 2,
+						-1, 0, 1 };
+
+	for (int x = 1; x < width - 1; ++x) {
+		for (int y = 1; y < height - 1; ++y) {
+			int order = 0;
+			for (int m = x-1; m <= x + 1; ++m) {
+				for (int n = y-1; n <= y + 1; ++n) {
+					int tempIndex = n * width + m;
+					neighbor[order] = _grayData[tempIndex];
+					++order;
+				}
+			}
+			int index = y * width + x;
+
+			int sum_x = 0;
+			for (int i = 0; i < 9; ++i) {
+				sum_x += neighbor[i] * model_x[i];
+			}
+			if (sum_x < 0) sum_x = -sum_x;
+			int sum_y = 0;
+			for (int i = 0; i < 9; ++i) {
+				sum_y += neighbor[i] * model_y[i];
+			}
+			if (sum_y < 0) sum_y = -sum_y;
+
+			img[index] = sum_x + sum_y;
+		}
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnWallis()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	for (int x = 1; x < width - 1; ++x) {
+		for (int y = 1; y < height - 1; ++y) {
+			int order = 0;
+			
+			int index = y * width + x;
+			int gray = 46 * (
+				5 * log(_grayData[index] + 1)
+				- (log(_grayData[index - 1] + 1)
+				+ log(_grayData[index + 1] + 1)
+				+ log(_grayData[index - width] + 1)
+				+ log(_grayData[index + width] + 1))
+				);
+
+			img[index] = gray;
 		}
 	}
 
