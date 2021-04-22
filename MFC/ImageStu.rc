@@ -249,6 +249,11 @@ BEGIN
         MENUITEM "Sobel算法",                     ID_Sobel
         MENUITEM "Wallis算法",                    ID_Wallis
     END
+    POPUP "实验八"
+    BEGIN
+        MENUITEM "RGB->HSI",                    ID_RGB_TO_HSI
+        MENUITEM "RGB->HSI->RGB",               ID_RGB_HSI_RGB
+    END
 END
 
 

@@ -129,6 +129,8 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_Robert, &CImageStuDlg::OnRobert)
 	ON_COMMAND(ID_Sobel, &CImageStuDlg::OnSobel)
 	ON_COMMAND(ID_Wallis, &CImageStuDlg::OnWallis)
+	ON_COMMAND(ID_RGB_TO_HSI, &CImageStuDlg::OnRgbToHsi)
+	ON_COMMAND(ID_RGB_HSI_RGB, &CImageStuDlg::OnRgbHsiRgb)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2018,4 +2020,151 @@ void CImageStuDlg::OnWallis()
 
 	if (img != NULL)
 		delete[] img;
+}
+
+
+void CImageStuDlg::OnRgbToHsi()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	const double pi = acos(-1.0);
+	CBaseColorInfo  *img = new CBaseColorInfo[size];
+
+	for (int index = 0; index < size; ++index) {
+		CBaseColorInfo info = _colorData[index];
+		// 归一化
+		double red= info.GetRed();
+		double green = info.GetGreen();
+		double blue = info.GetBlue();
+
+		if (red == green && red == blue) {
+			img[index] = CBaseColorInfo(0, 0, red);
+		}
+		else {
+			// 计算S
+			double r = red / 255;
+			double b = blue / 255;
+			double g = green / 255;
+			double i = (r + g + b) / 3;
+			double min = r;
+ 			if (min > g) {
+				min = g;
+			}
+			if (min > b) {
+				min = b;
+			}
+			double s = 1 - 3 / (r + g + b) * min;
+
+			//计算H
+			double son = ((r - g) + (r - b)) / 2;
+			double mother = sqrt ((r - g) * (r - g) + (r - b) * (g - b));
+			double angle = acos(son / mother);
+			double h = angle;
+			if (b > g) {
+				h = pi * 2 - angle;
+			}
+			img[index] = CBaseColorInfo(h / (2 * pi) * 255, s * 255, i * 255);
+		}
+		
+	}
+
+	ShowPicByArray(img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnRgbHsiRgb()
+{
+	// TODO: 在此添加命令处理程序代码
+		//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo* img = new CBaseColorInfo[size];
+
+	const double PI = 3.1415926;
+	const double PI_2 = 2 * PI;
+
+	//计算
+	for (int x = 0; x < size; ++x) {
+		//r, g, b -->hsi
+		CBaseColorInfo info = _colorData[x];
+		// 归一化
+		double r = info.GetRed() / 255.0;
+		double g = info.GetGreen() / 255.0;
+		double b = info.GetBlue() / 255.0;
+
+		//计算
+		double i = (r + g + b) / 3.0;
+		double h = 0.0;
+		double s = 0.0;
+		if (info.GetRed() == info.GetBlue() && info.GetGreen() == info.GetBlue()) {
+			//灰度图
+			h = 0.0;
+			s = 0.0;
+		}
+		else {
+			//计算s
+			//1）求出最小值
+			double min = r;
+			if (min > g) {
+				min = g;
+			}
+			if (min > b) {
+				min = b;
+			}
+			s = 1 - 3 * (min / (r + g + b));
+
+			//计算h
+			double son = ((r - g) + (r - b)) / 2;
+			double mom = sqrt((r - g) * (r - g) + (r - b) * (g - b));
+			double angle = acos(son / mom);
+
+			if (b <= g) {
+				h = angle;
+			}
+			else {
+				h = PI_2 - angle;
+			}
+		}
+
+			h = h / PI_2 * 360;
+
+		//饱和度
+		//s = 0;
+
+		//亮度
+		i = i * 255;
+
+		if ( h <= 120) {
+			h = h / 360.0 * PI_2;
+			r = i * (1 + s * cos(h) / cos(PI / 3.0 - h));
+			b = i * (1 - s);
+			g = 3 * i - (b + r);
+		}
+		else if (h <= 240) {
+			h = h / 360.0 * PI_2;
+			g = i * (1 + s * cos(h - PI * 2.0 / 3.0) / cos(PI - h));
+			r = i * (1 - s);
+			b = 3 * i - (g + r);
+		}
+		else {
+			h = h / 360.0 * PI_2;
+			b = i * (1 + s * cos(h - PI * 4.0 / 3.0) / cos(PI * 5.0 / 3.0 - h));
+			g = i * (1 - s);
+			r = 3 * i - (g + b);
+		}
+		//重新映射到[0, 255]
+		img[x] = CBaseColorInfo(r, g, b);
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL) 
+		delete[] img;
+	
 }

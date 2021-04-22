@@ -151,13 +151,18 @@
 #define ID_Sobel                        32905
 #define ID_32906                        32906
 #define ID_Wallis                       32907
+#define ID_32908                        32908
+#define ID_RGB_TO_HSI                   32909
+#define ID_32910                        32910
+#define ID_3291                         32911
+#define ID_RGB_HSI_RGB                  32912
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32908
+#define _APS_NEXT_COMMAND_VALUE         32913
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

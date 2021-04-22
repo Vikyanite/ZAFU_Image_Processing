@@ -142,6 +142,8 @@ public:
 	afx_msg void OnRobert();
 	afx_msg void OnSobel();
 	afx_msg void OnWallis();
+	afx_msg void OnRgbToHsi();
+	afx_msg void OnRgbHsiRgb();
 };
 
 //{{AFX_INSERT_LOCATION}}
