@@ -156,13 +156,34 @@
 #define ID_32910                        32910
 #define ID_3291                         32911
 #define ID_RGB_HSI_RGB                  32912
+#define ID_32913                        32913
+#define ID_32914                        32914
+#define ID_32915                        32915
+#define ID_32916                        32916
+#define ID_p292_6_15                    32917
+#define ID_216_FAKE_COLOR               32918
+#define ID_P297_6_22                    32919
+#define ID_P304_6_31                    32920
+#define ID_32921                        32921
+#define ID_32922                        32922
+#define ID_32923                        32923
+#define ID_32924                        32924
+#define ID_32925                        32925
+#define ID_32926                        32926
+#define ID_32927                        32927
+#define ID_EROSION                      32928
+#define ID_DIOLOTION                    32929
+#define ID_MULTI_EROSION                32930
+#define ID_MULTI_DIOLOTION              32931
+#define ID_OPEN                         32932
+#define ID_CLOSE                        32933
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32913
+#define _APS_NEXT_COMMAND_VALUE         32934
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

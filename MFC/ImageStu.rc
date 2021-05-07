@@ -223,36 +223,49 @@ BEGIN
         MENUITEM "对数变换",                        ID_GRAY_LOG
         MENUITEM "幂次变换",                        ID_GRAY_POWER
         MENUITEM "分段函数",                        ID_GRAY_SEG
+        MENUITEM "均平化",                         ID_JUNPINGHUA
     END
     POPUP "实验四"
     BEGIN
-        MENUITEM "均平化",                         ID_JUNPINGHUA
-    END
-    POPUP "实验五"
-    BEGIN
-        MENUITEM "邻域平均",                        ID_AVERAGE_FILTER
         MENUITEM "中心马赛克",                       ID_CENTER_MOSAC
         MENUITEM "加权平均",                        ID_WEIGHT_AVERAGE
         MENUITEM "快速邻域平均",                      ID_FAST_AVERAGE
         MENUITEM "快速加权平均",                      ID_FAST_WEIGHT
+        MENUITEM "邻域平均",                        ID_AVERAGE_FILTER
     END
-    POPUP "实验六"
+    POPUP "实验五"
     BEGIN
         MENUITEM "2D中值滤波（周围）",                  ID_2D_MIDDLE
         MENUITEM "2D中值滤波（十字）",                  ID_2D_MIDDLE_TEN
         MENUITEM "2D中值滤波（交叉）",                  ID_2D_MIDDLE_CROSS
     END
-    POPUP "实验七"
+    POPUP "实验六"
     BEGIN
         MENUITEM "拉普拉斯算子",                      ID_LAPLACIAN
         MENUITEM "Robert算法",                    ID_Robert
         MENUITEM "Sobel算法",                     ID_Sobel
         MENUITEM "Wallis算法",                    ID_Wallis
     END
-    POPUP "实验八"
+    POPUP "实验七"
     BEGIN
         MENUITEM "RGB->HSI",                    ID_RGB_TO_HSI
         MENUITEM "RGB->HSI->RGB",               ID_RGB_HSI_RGB
+    END
+    POPUP "实验八"
+    BEGIN
+        MENUITEM "P292_图6.15(咕咕咕",              ID_p292_6_15
+        MENUITEM "P297_图6.22",                  ID_P297_6_22
+        MENUITEM "P304_图6.31",                  ID_P304_6_31
+        MENUITEM "216伪彩色",                      ID_216_FAKE_COLOR
+    END
+    POPUP "实验九"
+    BEGIN
+        MENUITEM "腐蚀",                          ID_EROSION
+        MENUITEM "膨胀",                          ID_DIOLOTION
+        MENUITEM "多次腐蚀",                        ID_MULTI_EROSION
+        MENUITEM "多次膨胀",                        ID_MULTI_DIOLOTION
+        MENUITEM "开操作",                         ID_OPEN
+        MENUITEM "闭操作",                         ID_CLOSE
     END
 END
 

@@ -131,6 +131,16 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_Wallis, &CImageStuDlg::OnWallis)
 	ON_COMMAND(ID_RGB_TO_HSI, &CImageStuDlg::OnRgbToHsi)
 	ON_COMMAND(ID_RGB_HSI_RGB, &CImageStuDlg::OnRgbHsiRgb)
+	ON_COMMAND(ID_p292_6_15, &CImageStuDlg::Onp292615)
+	ON_COMMAND(ID_216_FAKE_COLOR, &CImageStuDlg::On216FakeColor)
+	ON_COMMAND(ID_P297_6_22, &CImageStuDlg::OnP297622)
+	ON_COMMAND(ID_P304_6_31, &CImageStuDlg::OnP304631)
+	ON_COMMAND(ID_EROSION, &CImageStuDlg::OnErosion)
+	ON_COMMAND(ID_DIOLOTION, &CImageStuDlg::OnDiolotion)
+	ON_COMMAND(ID_MULTI_EROSION, &CImageStuDlg::OnMultiErosion)
+	ON_COMMAND(ID_MULTI_DIOLOTION, &CImageStuDlg::OnMultiDiolotion)
+	ON_COMMAND(ID_OPEN, &CImageStuDlg::OnOpen)
+	ON_COMMAND(ID_CLOSE, &CImageStuDlg::OnClose)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2167,4 +2177,555 @@ void CImageStuDlg::OnRgbHsiRgb()
 	if (img != NULL) 
 		delete[] img;
 	
+}
+
+void CImageStuDlg::Onp292615()
+{
+
+}
+
+void CImageStuDlg::OnP297622()
+{
+	CBaseColorInfo color[256];
+	int order = 0;
+	const double PI = 3.1415926;
+	for (int i = 0; i < 256; ++i) {
+		///这里的函数是自选的哦
+		color[i] = CBaseColorInfo(255 * abs(sin(2*PI*i / 255.0)), 255 * abs(cos(2*PI*i / 255.0)), i);
+	}
+
+	//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo* img = new CBaseColorInfo[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		img[i] = color[gray];
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL)
+		delete[] img;
+}
+
+void CImageStuDlg::OnP304631()
+{
+	//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo* img = new CBaseColorInfo[size];
+	for (int i = 0; i < size; ++i) {
+		int red = _colorData[i].GetRed();
+		int blue = _colorData[i].GetBlue();
+		int green = _colorData[i].GetGreen();
+		img[i] = CBaseColorInfo(255 - red, 255 - green, 255 - blue);
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL)
+		delete[] img;
+}
+
+void CImageStuDlg::On216FakeColor()
+{
+	//1)生成216颜色
+	int color_level[6] = { 0, 51, 102, 153, 204, 256 };
+	CBaseColorInfo color_216[216];
+	int order = 0;
+	for (int red = 0; red < 6; ++red) {
+		for (int green = 0; green < 6; ++green) {
+			for (int blue = 0; blue < 6; ++blue) {
+				CBaseColorInfo info(color_level[red], color_level[green], color_level[blue]);
+				color_216[order++] = info;
+			}
+		}
+	}
+	// 2)转换
+	int rule[256] = { 0 };
+	for (int i = 0; i < 256; ++i) {
+		rule[i] = i * 216 / 255.0;
+	}
+	//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo* img = new CBaseColorInfo[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		img[i] = color_216[rule[gray]];
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL)
+		delete[] img;
+}
+
+
+void CImageStuDlg::OnErosion()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width - 1; ++x) {
+		for (int y = 1; y < height - 1; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 0) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 0) {
+						img[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	int * show_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			show_img[i] = 0;
+		}
+		else show_img[i] = 255;
+	}
+	ShowPicByArray(show_img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
+	if (show_img != NULL)
+		delete[] show_img;
+}
+
+
+void CImageStuDlg::OnDiolotion()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 1) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 1) {
+						img[index] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	int * show_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			show_img[i] = 0;
+		}
+		else show_img[i] = 255;
+	}
+	ShowPicByArray(show_img, width, height);
+
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
+	if (show_img != NULL)
+		delete[] show_img;
+}
+
+void CImageStuDlg::OnMultiErosion()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index]; 
+			if (oldgray == 0) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 0) {
+						img[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+	
+	for (int i = 0; i < size; ++i) {
+		int gray = img[i]; /////注意这里是img哦，上面是graydata
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 0) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 0) {
+						img[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	ShowPicByArray(img, width, height);
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
+
+}
+
+void CImageStuDlg::OnMultiDiolotion()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 1) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 1) {
+						img[index] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	for (int i = 0; i < size; ++i) {
+		int gray = img[i]; /////注意这里是img哦，上面是graydata
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 1) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 1) {
+						img[index] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	ShowPicByArray(img, width, height);
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
+}
+
+
+void CImageStuDlg::OnOpen()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 0) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 0) {
+						img[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	for (int i = 0; i < size; ++i) {
+		int gray = img[i]; /////注意这里是img哦，上面是graydata
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 1) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 1) {
+						img[index] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	ShowPicByArray(img, width, height);
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
+
+}
+
+
+void CImageStuDlg::OnClose()
+{
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int *img = new int[size];
+
+	int* two_gray_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		int gray = _grayData[i];
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 1) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 1) {
+						img[index] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	for (int i = 0; i < size; ++i) {
+		int gray = img[i]; /////注意这里是img哦，上面是graydata
+		if (gray >= 200) {
+			two_gray_img[i] = 1;
+		}
+		else {
+			two_gray_img[i] = 0;
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		img[i] = two_gray_img[i];
+	}
+	for (int x = 1; x < width; ++x) {
+		for (int y = 1; y < height; ++y) {
+			int index = y * width + x;
+			int oldgray = two_gray_img[index];
+			if (oldgray == 0) continue;
+			for (int m = x - 1; m <= x; ++m) {
+				for (int n = y - 1; n <= y; ++n) {
+					int tempIndex = n * width + m;
+					int tempGray = two_gray_img[tempIndex];
+					if (tempGray == 0) {
+						img[index] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 0) {
+			img[i] = 0;
+		}
+		else img[i] = 255;
+	}
+
+	ShowPicByArray(img, width, height);
+	if (img != NULL)
+		delete[] img;
+	if (two_gray_img != NULL)
+		delete[] two_gray_img;
 }

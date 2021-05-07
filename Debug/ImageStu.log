@@ -1,32 +1,36 @@
-﻿  ImageStuDlg.cpp
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1044): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1276): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1277): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1284): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1285): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1303): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1304): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1311): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1312): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1330): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1331): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+﻿  ImageStu.cpp
+  ImageStuDlg.cpp
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1054): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1286): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1287): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1294): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1295): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1313): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1314): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1321): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1322): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1340): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
 c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1341): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1342): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1346): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1347): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1353): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1354): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1358): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1359): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1365): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1413): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1419): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1440): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1444): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1471): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1474): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2007): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2042): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2067): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2161): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1351): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1352): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1356): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1357): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1363): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1364): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1368): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1369): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1375): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1423): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1429): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1450): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1454): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1481): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(1484): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2017): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2052): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2077): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2171): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2194): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+c:\users\32416\desktop\zafu_image_processing\mfc\imagestudlg.cpp(2252): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+  正在生成代码...
   ImageStu.vcxproj -> C:\Users\32416\Desktop\ZAFU_Image_Processing\.\Debug\ImageStu.exe

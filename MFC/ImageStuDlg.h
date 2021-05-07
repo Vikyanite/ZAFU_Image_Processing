@@ -144,6 +144,16 @@ public:
 	afx_msg void OnWallis();
 	afx_msg void OnRgbToHsi();
 	afx_msg void OnRgbHsiRgb();
+	afx_msg void Onp292615();
+	afx_msg void On216FakeColor();
+	afx_msg void OnP297622();
+	afx_msg void OnP304631();
+	afx_msg void OnErosion();
+	afx_msg void OnDiolotion();
+	afx_msg void OnMultiErosion();
+	afx_msg void OnMultiDiolotion();
+	afx_msg void OnOpen();
+	afx_msg void OnClose();
 };
 
 //{{AFX_INSERT_LOCATION}}
