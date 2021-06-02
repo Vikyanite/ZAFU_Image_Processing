@@ -253,7 +253,7 @@ BEGIN
     END
     POPUP "实验八"
     BEGIN
-        MENUITEM "P292_图6.15(咕咕咕",              ID_p292_6_15
+        MENUITEM "P292_图6.15",                  ID_p292_6_15
         MENUITEM "P297_图6.22",                  ID_P297_6_22
         MENUITEM "P304_图6.31",                  ID_P304_6_31
         MENUITEM "216伪彩色",                      ID_216_FAKE_COLOR
@@ -266,6 +266,12 @@ BEGIN
         MENUITEM "多次膨胀",                        ID_MULTI_DIOLOTION
         MENUITEM "开操作",                         ID_OPEN
         MENUITEM "闭操作",                         ID_CLOSE
+    END
+    POPUP "实验十"
+    BEGIN
+        MENUITEM "求边界",                         ID_BOUND
+        MENUITEM "填充",                          ID_FILL
+        MENUITEM "连通分量",                        ID_CC
     END
 END
 

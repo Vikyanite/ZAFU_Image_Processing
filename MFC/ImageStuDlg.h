@@ -154,6 +154,9 @@ public:
 	afx_msg void OnMultiDiolotion();
 	afx_msg void OnOpen();
 	afx_msg void OnClose();
+	afx_msg void OnBound();
+	afx_msg void OnFill();
+	afx_msg void OnCc();
 };
 
 //{{AFX_INSERT_LOCATION}}

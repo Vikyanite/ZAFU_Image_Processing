@@ -141,6 +141,7 @@
     <ClCompile Include="MFC\DlgTask.cpp" />
     <ClCompile Include="MFC\ImageStu.cpp" />
     <ClCompile Include="MFC\ImageStuDlg.cpp" />
+    <ClCompile Include="Morphology.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
@@ -161,6 +162,7 @@
     <ClInclude Include="MFC\ImageStu.h" />
     <ClInclude Include="MFC\ImageStuDlg.h" />
     <ClInclude Include="MFC\Resource.h" />
+    <ClInclude Include="Morphology.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>

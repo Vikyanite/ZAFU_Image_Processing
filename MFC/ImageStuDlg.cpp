@@ -10,6 +10,7 @@
 #include <afxole.h>
 #include <cmath>
 #include <algorithm>
+#include "Morphology.h"
 #include <iostream>
 #include <sstream>
 
@@ -141,6 +142,9 @@ BEGIN_MESSAGE_MAP(CImageStuDlg, CDialog)
 	ON_COMMAND(ID_MULTI_DIOLOTION, &CImageStuDlg::OnMultiDiolotion)
 	ON_COMMAND(ID_OPEN, &CImageStuDlg::OnOpen)
 	ON_COMMAND(ID_CLOSE, &CImageStuDlg::OnClose)
+	ON_COMMAND(ID_BOUND, &CImageStuDlg::OnBound)
+	ON_COMMAND(ID_FILL, &CImageStuDlg::OnFill)
+	ON_COMMAND(ID_CC, &CImageStuDlg::OnCc)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2181,7 +2185,123 @@ void CImageStuDlg::OnRgbHsiRgb()
 
 void CImageStuDlg::Onp292615()
 {
+	// TODO: 在此添加命令处理程序代码
+	//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	CBaseColorInfo* img = new CBaseColorInfo[size];
 
+	const double PI = 3.1415926;
+	const double PI_2 = 2 * PI;
+
+	//计算
+	for (int x = 0; x < size; ++x) {
+		//r, g, b -->hsi
+		CBaseColorInfo info = _colorData[x];
+		// 归一化
+		double r = info.GetRed() / 255.0;
+		double g = info.GetGreen() / 255.0;
+		double b = info.GetBlue() / 255.0;
+
+		//计算
+		double i = (r + g + b) / 3.0;
+		//图6.15(b)
+		if (r > 0.9 && g > 0.9 && b > 0.9)
+			i /= 2;
+		double h = 0.0;
+		double s = 0.0;
+		if (info.GetRed() == info.GetBlue() && info.GetGreen() == info.GetBlue()) {
+			//灰度图
+			h = 0.0;
+			s = 0.0;
+		}
+		else {
+			//计算s
+			//1）求出最小值
+			double min = r;
+			if (min > g) {
+				min = g;
+			}
+			if (min > b) {
+				min = b;
+			}
+			s = 1 - 3 * (min / (r + g + b));
+			//图6.15(b)
+			if (r < 0.1 && g>0.9 && b > 0.9)
+				s /= 2;
+
+			//计算h
+			//图6.15(a)
+			if (b && g < 0.1 && r < 0.1) {
+				b = 0;
+				r = 1;
+				g = 0;
+			}
+			if (g && b < 0.1 && r < 0.1) {
+				g = 0;
+				r = 1;
+				b = 0;
+			}
+			if (r && b < 0.1 && g < 0.1) {
+				g = 0;
+				r = 1;
+				b = 0;
+			}
+			double son = ((r - g) + (r - b)) / 2;
+			double mom = sqrt((r - g) * (r - g) + (r - b) * (g - b));
+			double angle = acos(son / mom);
+
+			if (b <= g) {
+				h = angle;
+			}
+			else {
+				h = PI_2 - angle;
+			}
+		}
+
+		//img[x] = CBaseColorInfo(h / PI_2 * 255, h / PI_2 * 255, h / PI_2 * 255);
+		//img[x] = CBaseColorInfo(s * 255, s * 255, s * 255);
+		//img[x] = CBaseColorInfo(i * 255, i * 255, i * 255);
+
+
+		//色度
+		h = h / PI_2 * 360;
+
+		//饱和度
+		//s = 0;
+
+		//亮度
+		i = i * 255;
+
+		if (h >= 0 && h <= 120) {
+			h = h / 360.0 * PI_2;
+			r = i * (1 + s * cos(h) / cos(PI / 3.0 - h));
+			b = i * (1 - s);
+			g = 3 * i - (b + r);
+		}
+		else if (h >= 120 && h <= 240) {
+			h = h / 360.0 * PI_2;
+			g = i * (1 + s * cos(h - PI * 2.0 / 3.0) / cos(PI - h));
+			r = i * (1 - s);
+			b = 3 * i - (g + r);
+		}
+		else {
+			h = h / 360.0 * PI_2;
+			b = i * (1 + s * cos(h - PI * 4.0 / 3.0) / cos(PI * 5.0 / 3.0 - h));
+			g = i * (1 - s);
+			r = 3 * i - (g + b);
+		}
+		//重新映射到[0, 255]
+		img[x] = CBaseColorInfo(r, g, b);
+	}
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL) {
+		delete[] img;
+	}
 }
 
 void CImageStuDlg::OnP297622()
@@ -2728,4 +2848,232 @@ void CImageStuDlg::OnClose()
 		delete[] img;
 	if (two_gray_img != NULL)
 		delete[] two_gray_img;
+}
+
+
+void CImageStuDlg::OnBound()
+{
+	// TODO: 在此添加命令处理程序代码
+	// TODO: 在此添加命令处理程序代码
+	//生成图像
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+	int* init_img = _grayData;
+
+	for (int i = 0; i < size; ++i) {
+		if (init_img[i] > 10)
+			init_img[i] = 255;
+		else
+			init_img[i] = 0;
+	}
+
+	//声明类， 传入参数
+	Morphology bean(init_img, width, height, 0);
+
+	//腐蚀
+	int model[9] = { 1,1,1,  1,1,1,  1,1,1 };
+	bean.expand(model, 3);
+	int* img = bean.getResult();
+
+
+	for (int i = 0; i < size; ++i) {
+		if (img[i] - init_img[i] == 0)
+			img[i] = 0;
+		else
+			img[i] = 255;
+	}
+
+	//显示
+	ShowPicByArray(img, width, height);
+
+	//删除
+	if (img != NULL) {
+		delete[] img;
+	}
+}
+
+
+void CImageStuDlg::OnFill()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+
+	//灰度图像转成二值图像
+	int* bio_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (_grayData[i] > 240)
+			bio_img[i] = 1;
+		else
+			bio_img[i] = 0;
+	}
+
+	//生成反向图像
+	int* inverse_img = new int[size];
+	Morphology::inverse(bio_img, inverse_img, size);
+
+	//生成初始图像
+	int originX = 255;
+	int originY = 148;
+	int* originImg = new int[size];
+	for (int i = 0; i < size; ++i) {
+		originImg[i] = 0;
+	}
+	int originIndex = originY * width + originX;
+	originImg[originIndex] = 1;
+	originX = 111;
+	originY = 300;
+	originIndex = originY * width + originX;
+	originImg[originIndex] = 1;
+
+	//交集图像
+	int* intersection_img = new int[size];
+
+	//声明类， 传入参数
+	int flag = 1;
+	Morphology bean(originImg, width, height, flag);
+	//膨胀
+	int model[9] = { 0,1,0,  1,1,1,  0,1,0 };
+	int* img = new int[size];
+	bean.expand(model, 3);
+	img = bean.getResult();
+	int* tempimg = img;
+	for (int i = 0; i < 10; ++i) {
+
+		Morphology bean1(tempimg, width, height, flag);
+		bean1.expand(model, 3);
+		tempimg = bean1.getResult();	//膨胀图像
+		Morphology::intersection_set(tempimg, inverse_img, intersection_img, size, flag);
+		for (int index = 0; index < size; ++index) {
+			originImg[index] = intersection_img[index];
+		}
+	}
+
+	Morphology::union_set(bio_img, intersection_img, originImg, size, flag);
+
+	img = originImg;
+	//二值图像转成灰度图像
+	int* showImg = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (img[i] == 1)
+			showImg[i] = 255;
+		else
+			showImg[i] = 0;
+	}
+	//显示
+	ShowPicByArray(showImg, width, height);
+
+	//删除
+	if (img != NULL) {
+		delete[] img;
+	}
+	if (showImg != NULL) {
+		delete[] showImg;
+	}
+	if (bio_img != NULL) {
+		delete[] bio_img;
+	}
+}
+
+
+
+
+void CImageStuDlg::OnCc()
+{
+	// TODO: 在此添加命令处理程序代码
+	int width = _infoHeader.biWidth;
+	int height = _infoHeader.biHeight;
+	int size = width * height;
+
+	//灰度图像转成二值图像A
+	int* bio_img = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (_grayData[i] > 240)
+			bio_img[i] = 1;
+		else
+			bio_img[i] = 0;
+	}
+
+	//生成初始图像
+	int label = 0;
+	int* imgL = new int[size];
+	int* imgtempA = new int[size];
+	int* imgtempB = new int[size];
+	int flag = 1;
+	int model[9] = { 1,1,1,  1,1,1,  1,1,1 };
+
+	for (int i = 0; i < size; ++i) {
+		imgL[i] = 0;
+		imgtempA[i] = 0;
+		imgtempB[i] = 0;
+	}
+	int find = 0;
+	bool sam = true;
+	for (int x = 1; x < width - 1; ++x) {
+		for (int y = 1; y < height - 1; ++y) {
+			int index = x + y * width;
+			if (bio_img[index] == 1 && imgL[index] == 0) {
+				sam = true;
+				find++;
+				imgtempA[index] = 1;
+				Morphology bean(imgtempA, width, height, flag);
+				//膨胀
+				bean.expand(model, 3);
+				int* tempimg = bean.getResult();
+				while (1) {
+					Morphology bean(tempimg, width, height, flag);
+					//膨胀
+					bean.expand(model, 3);
+					tempimg = bean.getResult();
+					Morphology::intersection_set(imgtempA, tempimg, imgtempB, size, flag);
+					for (int i = 0; i < size; ++i) {
+						if (imgtempA[i] != imgtempB[i]) {
+							sam = false;
+							break;
+						}
+					}
+					if (!sam) {
+						for (int i = 0; i < size; ++i) {
+							imgtempA[i] = imgtempB[i];
+						}
+						continue;
+					}
+					else
+						break;
+				}
+				//imgtempA = tempimg;
+
+				label++;
+				for (int i = 0; i < size; ++i) {
+					if (imgtempA[i] == 1)
+						imgL[i] = label;
+				}
+			}
+			if (find == 255)
+				break;
+		}
+		if (find == 255)
+			break;
+	}
+
+	//二值图像转成灰度图像
+	int* showImg = new int[size];
+	for (int i = 0; i < size; ++i) {
+		if (imgL[i] != 0)
+			showImg[i] = 255;
+		else
+			showImg[i] = 0;
+	}
+	//显示
+	ShowPicByArray(showImg, width, height);
+
+	//删除
+	if (showImg != NULL) {
+		delete[] showImg;
+	}
+	if (bio_img != NULL) {
+		delete[] bio_img;
+	}
 }

@@ -177,13 +177,19 @@
 #define ID_MULTI_DIOLOTION              32931
 #define ID_OPEN                         32932
 #define ID_CLOSE                        32933
+#define ID_32934                        32934
+#define ID_32935                        32935
+#define ID_32936                        32936
+#define ID_BOUND                        32937
+#define ID_FILL                         32938
+#define ID_CC                           32939
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32934
+#define _APS_NEXT_COMMAND_VALUE         32940
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
